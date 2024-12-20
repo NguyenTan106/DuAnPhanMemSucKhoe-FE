@@ -22,7 +22,6 @@ class UserManage extends Component {
         this.setState({
           arrUsers: response.data.users,
         });
-        console.log("check state user", response.data.users);
       } else {
         console.error(`Failed to fetch users: ${response.statusText}`);
       }
@@ -65,7 +64,7 @@ class UserManage extends Component {
                         <td>
                           <button className="btn-edit">
                             <i className="fas fa-edit"></i>
-                          </button>{" "}
+                          </button>
                           <button className="btn-delete">
                             <i className="fas fa-trash"></i>
                           </button>

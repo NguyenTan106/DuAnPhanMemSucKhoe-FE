@@ -1,22 +1,22 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
-import * as actions from "../../store/actions";
 import { FormattedMessage } from "react-intl";
 import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import Form from "react-bootstrap/Form";
 import Col from "react-bootstrap/Col";
 import Button from "react-bootstrap/Button";
-
+import { handleLogin } from "../../services/userService";
 import "./Login.scss";
 
 class Login extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      email: "abc",
-      password: "123",
+      email: "",
+      password: "",
       isShowPassword: false,
+      errMessage: "",
     };
   }
 
@@ -32,11 +32,30 @@ class Login extends Component {
     });
   };
 
-  handleLogin = () => {
-    console.log(this.state.email);
-    console.log(this.state.password);
+  handleLogin = async () => {
+    this.setState({
+      errMessage: "",
+    });
+    try {
+      let data = await handleLogin(this.state.email, this.state.password);
+      if (data.data && data.data.errCode !== 0) {
+        this.setState({
+          errMessage: data.data.errMessage,
+        });
+      }
+      if (data.data && data.data.errCode === 0) {
+        console.log("login succeed!");
+      }
+    } catch (error) {
+      if (error.response.data) {
+        this.setState({
+          errMessage: error.response.data.errMessage,
+        });
+      }
+    }
   };
 
+  handleCreateNewUser = () => {};
   showHidePassword = () => {
     this.setState({
       isShowPassword: !this.state.isShowPassword,
@@ -90,16 +109,26 @@ class Login extends Component {
                   </span>
                 </div>
               </Form.Group>
+              <div style={{ color: "red" }}>{this.state.errMessage}</div>
 
               <Button
                 variant="primary"
-                className="w-100"
+                className="w-100 my-2"
                 onClick={() => {
                   this.handleLogin();
                 }}
               >
                 Login
               </Button>
+              <div style={{ textAlign: "center" }}>
+                <a
+                  style={{ textDecoration: "none" }}
+                  href="/register"
+                  onClick={() => this.handleCreateNewUser()}
+                >
+                  Sign up
+                </a>
+              </div>
             </Form>
           </Col>
         </Row>
