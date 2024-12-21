@@ -7,4 +7,15 @@ const getAllUsers = (userId) => {
   return axios.get(`/api/get-all-users?id=${userId}`);
 };
 
-export { getAllUsers, handleLogin };
+const registerNewUser = (email, name, age, gender, password, roleId) => {
+  return axios.post("http://localhost:8080/api/v1/register", {
+    email,
+    name,
+    age,
+    gender,
+    password,
+    roleId,
+  });
+};
+
+export { getAllUsers, handleLogin, registerNewUser };
