@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { handleLogin } from "../../services/userService";
 import "./Login.scss";
 import Container from "react-bootstrap/Container";
@@ -6,8 +6,10 @@ import Row from "react-bootstrap/Row";
 import Form from "react-bootstrap/Form";
 import Col from "react-bootstrap/Col";
 import Button from "react-bootstrap/Button";
-
+import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 const Login = () => {
+  const history = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isShowPassword, setIsShowPassword] = useState(false);
@@ -17,16 +19,26 @@ const Login = () => {
     setErrMessage("");
     try {
       let data = await handleLogin(email, password);
-      if (data.data && data.data.errCode !== 0) {
-        setErrMessage(data.data.errMessage);
-      } else if (data.data && data.data.errCode === 0) {
+      let dataUser = data.data;
+      if (dataUser && dataUser.errCode !== 0) {
+        setErrMessage(dataUser.errMessage);
+        toast.error(dataUser.errMessage);
+      } else if (dataUser && dataUser.errCode === 0) {
+        toast.success(dataUser.errMessage);
+        let data = {
+          isAuthenthicated: true,
+          token: "fake token",
+        };
+        sessionStorage.setItem("account", JSON.stringify(data));
         console.log("login succeed!");
         // Điều hướng sang trang khác nếu cần
-        window.location.href = "/home";
+        // window.location.href = "/home";
+        history("/home");
       }
     } catch (error) {
       if (error.response && error.response.data) {
         setErrMessage(error.response.data.errMessage);
+        toast.error(error.response.data.errMessage);
       }
     }
   };
@@ -38,6 +50,19 @@ const Login = () => {
   const toggleShowPassword = () => {
     setIsShowPassword(!isShowPassword);
   };
+
+  const handlePressEnter = (e) => {
+    if (e.code == "Enter" && e.charCode == 13) {
+      handleLoginSubmit();
+    }
+  };
+
+  useEffect(() => {
+    let session = sessionStorage.getItem("account");
+    if (session) {
+      history("/home");
+    }
+  }, []);
 
   return (
     <Container className="mt-5">
@@ -66,6 +91,7 @@ const Login = () => {
                   placeholder="Password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
+                  onKeyPress={(e) => handlePressEnter(event)}
                   required
                 />
                 <span onClick={toggleShowPassword}>

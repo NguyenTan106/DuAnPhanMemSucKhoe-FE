@@ -2,7 +2,7 @@ import "./Register.scss";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
-import { useHistory } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { registerNewUser } from "../../services/userService";
 const Register = (props) => {
   const [email, setEmail] = useState("");
@@ -19,10 +19,10 @@ const Register = (props) => {
     // });
   }, []);
 
-  // let history = useHistory();
-  // const handleLogin = () => {
-  //   history.push("/login");
-  // };
+  let history = useNavigate();
+  const handleLogin = () => {
+    history("/login");
+  };
   const isValidInputs = () => {
     if (!email) {
       toast.error("Email is required");
@@ -201,7 +201,18 @@ const Register = (props) => {
 
       <div className="container signin">
         <p>
-          Already have an account? <a href="/login">Sign in</a>.
+          Already have an account?{" "}
+          <a
+            style={{
+              cursor: "pointer",
+              color: "blue",
+              textDecoration: "underline",
+            }}
+            onClick={() => handleLogin()}
+          >
+            Sign in
+          </a>
+          .
         </p>
       </div>
     </>
